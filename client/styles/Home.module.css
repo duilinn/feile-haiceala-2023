@@ -1,0 +1,150 @@
+.mainContainer {
+    display: flex;
+    padding: 20px;
+    margin: 0px 10px 0px 0px;
+}
+
+.pageExtract {
+    max-width: 60%;
+    min-width: 60%;
+    max-height: 100%;
+    overflow: hidden;
+    background-color: #ffffc0;
+    min-height: 50%;
+    margin-right: 20px;
+    padding: 20px;
+    border: 1px solid black;
+    border-radius: 20px;
+}
+
+.donegalButton,
+.galwayButton,
+.kerryButton,
+.mayoButton,
+.clareButton,
+.corkButton,
+.waterfordButton {
+    padding: 10px;
+    text-align: center;
+}
+
+.donegalButton {
+    background-color: lightcoral;
+}
+
+.galwayButton {
+    background-color: lightgreen;
+}
+
+.kerryButton {
+    background-color: lightskyblue;
+}
+
+.mayoButton {
+    background-color: greenyellow;
+}
+
+.clareButton {
+    background-color: lightseagreen;
+}
+
+.corkButton {
+    background-color: cornflowerblue;
+}
+
+.waterfordButton {
+    background-color: violet;
+}
+
+.pointer,
+.donegalMap,
+.mayoMap,
+.galwayMap,
+.clareMap,
+.kerryMap,
+.corkMap,
+.waterfordMap {
+    cursor: pointer;
+}
+
+.donegalMap {
+    fill: lightcoral;
+}
+
+.mayoMap {
+    fill: greenyellow;
+}
+
+.galwayMap {
+    fill: mediumseagreen;
+}
+
+.clareMap {
+    fill: darkturquoise;
+}
+
+.kerryMap {
+    fill: cyan;
+}
+
+.corkMap {
+    fill: cornflowerblue;
+}
+
+.waterfordMap {
+    fill: violet;
+}
+
+.rightAnswer,
+.wrongAnswer,
+.firstQuestion {
+    font-size: 1.25em;
+    font-weight: bold;
+}
+
+.rightAnswer {
+    color: darkgreen;
+}
+
+.wrongAnswer {
+    color: darkred;
+}
+
+.startButton {
+    width: 100%;
+    height: 100%;
+    padding: 20px;
+    font-size: 5em;
+}
+
+.countiesImage {
+    width: 300px;
+}
+
+.sidebar {
+    min-width: 40%;
+}
+
+.answerTable td {
+    padding: 10px;
+    border: -5px;
+}
+
+.answerTable {
+    width: 100%;
+    font-size: 1.5em;
+    margin: 0px;
+}
+
+.answerTable tr:nth-child(1) {
+    background-color: lightgreen;
+}
+
+.answerTable tr:nth-child(2) {
+    background-color: lightcoral;
+}
+
+.questionNumber {
+    font-size: 2em;
+    font-weight: bold;
+}
