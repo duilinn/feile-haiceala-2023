@@ -1,8 +1,6 @@
 import Head from 'next/head';
 import styles from '../styles/Home.module.css';
 import React, { useState, useEffect } from "react";
-import SvgComponent from './svgComponent';
-// import {Svg, Path} from 'react-native-svg';
 
 export default function Home() {
   const [currentPages, setCurrentPages] = useState([]);
@@ -10,12 +8,26 @@ export default function Home() {
   const [answerResult, setAnswerResult] = useState("Roghnaigh contae.");
   const [correctAnswers, setCorrectAnswers] = useState(0);
   const [incorrectAnswers, setIncorrectAnswers] = useState(0);
+
   const [gameStarted, setGameStarted] = useState(0);
+  const [gameOver, setGameOver] = useState(0);
   const [hardMode, setHardMode] = useState(0);
   const [questionNumber, setQuestionNumber] = useState(1);
 
-  function startGame() {
+  const [timeLeft, setTimeLeft] = useState(15);
+  const [timerStart, setTimerStart] = useState(15);
+
+  const [correctCounties, setCorrectCounties] = useState([0, 0, 0, 0, 0, 0, 0]);
+  const [incorrectCounties, setIncorrectCounties] = useState([0, 0, 0, 0, 0, 0, 0]);
+
+  function startGame(isHardMode) {
     setGameStarted(1);
+
+    if (isHardMode == 1) {
+      setTimerStart(30);
+    } else {
+      setTimerStart(15);
+    }
     getItem();
   }
 
@@ -34,17 +46,73 @@ export default function Home() {
       });
   }
 
+  function getCountyIndex(c) {
+    return ["Donegal", "Galway", "Kerry", "Mayo", "Clare", "Cork", "Waterford"].indexOf(c);
+  }
+
   function buttonClicked(countyName) {
+    // <input
+    // type="text"
+    // value={inputTexts[i]} placeholder={"Word " + (i + 1)}
+    // onChange={(e) => { setInputTexts(previousInputTexts => [...previousInputTexts.slice(0, i), e.target.value, ...previousInputTexts.slice(i + 1)]) }} />
     if (countyName == currentCounty) {
       setAnswerResult("Ceart! " + translateCounty(currentCounty) + " a bhí ann.");
       setCorrectAnswers(correctAnswers + 1);
-    } else {
+
+      var i = getCountyIndex(currentCounty);
+      setCorrectCounties(p => [...p.slice(0, i), p[i] + 1, ...p.slice(i + 1)]);
+
+    } else if (countyName != "") {
       setAnswerResult("Mícheart! Roghnaigh tú " + translateCounty(countyName) + ", ach " + translateCounty(currentCounty) + " a bhí ann.");
       setIncorrectAnswers(incorrectAnswers + 1);
+
+      var i = getCountyIndex(currentCounty);
+      setIncorrectCounties(p => [...p.slice(0, i), p[i] + 1, ...p.slice(i + 1)]);
+    } else {
+      setAnswerResult("Tá an t-am caite! " + translateCounty(currentCounty) + " a bhí ann.");
+      setIncorrectAnswers(incorrectAnswers + 1);
+
+      var i = getCountyIndex(currentCounty);
+      setIncorrectCounties(p => [...p.slice(0, i), p[i] + 1, ...p.slice(i + 1)]);
     }
     setQuestionNumber(questionNumber + 1);
-    getItem();
+
+    if (questionNumber < 20) {
+      setTimeLeft(timerStart);
+      getItem();
+    }
+    else {
+      setGameOver(1);
+    }
   }
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+
+      if (timeLeft > 0 && gameStarted && !gameOver) {
+        setTimeLeft(timeLeft - 1);
+      }
+    }, 1000);
+
+    if (timeLeft == 0 && !gameOver) {
+      buttonClicked("");
+    }
+    return () => clearTimeout(timer);
+  });
+
+  const timerComponents = [];
+
+  Object.keys(timeLeft).forEach((interval) => {
+    if (!timeLeft[interval]) {
+      return;
+    }
+
+    timerComponents.push(
+      <span>
+        {timeLeft[interval]} {interval}{" "}
+      </span>
+    );
+  });
 
   return (
     <div className={styles.container}>
@@ -55,12 +123,23 @@ export default function Home() {
 
       <main>
         <div className={styles.mainContainer}>
-          {gameStarted == 1 ? <>
+          {gameStarted == 1 ? (gameOver == 0 ? <>
             <div className={styles.pageExtract}>
               {currentPages.map((page, i) => <div key={i}>{page}</div>)}
             </div>
             <div className={styles.sidebar}>
-
+              <div className={styles.timerInterface}>
+                <div className={styles.timerBar}>
+                  <div className={styles.timerElapsed} style={{ "width": Math.floor((timerStart - timeLeft) * (hardMode ? 3.33333 : 6.66667)) + "%" }}>
+                    {timeLeft}
+                  </div>
+                </div>
+                <div>
+                  <button onClick={(e) => { e.preventDefault(); buttonClicked(""); }}>
+                    Scipeáil
+                  </button>
+                </div>
+              </div>
               {/* <div className={styles.countiesList}>
                 <button className={styles.donegalButton} onClick={() => { buttonClicked("Donegal") }}>
                   Dún na nGall
@@ -84,7 +163,7 @@ export default function Home() {
                   Port Láirge
                 </button> : <></>}
               </div> */}
-              <div style={{ "width": "60%", "maxHeight": "100%" }}>
+              <div style={{ "width": "60%", "maxHeight": "90%" }}>
                 <span className={styles.questionNumber}>Ceist {questionNumber}</span>
                 <svg version="1.0"
                   viewBox="0 0 1400 1800"
@@ -96,37 +175,37 @@ export default function Home() {
                     <path
                       d="m 253.94086,34.740795 c -10.08041,47.199154 -20.16081,94.398315 -30.24122,141.597465 22.47997,10.56319 44.83836,21.38497 67.39411,31.78674 5.48623,4.6553 11.98332,-0.79508 18.39576,0.61637 5.20237,0.3054 6.68863,-3.47803 11.89285,-4.20572 -0.22945,-7.0646 6.03999,-12.5723 11.7059,-7.69233 5.00894,-0.96523 12.08251,1.59333 12.65167,-5.20718 2.44671,-5.02073 11.12432,-6.26106 12.85372,-10.41945 -0.77427,-5.20978 -7.50707,3.44028 -10.10201,-2.6947 -2.53593,-3.28271 -7.37093,3.64304 -7.71232,-3.42728 -6.06707,-0.005 -3.78846,-5.42944 -5.19112,-7.48513 -3.56611,-3.4837 6.47247,0.016 5.54279,-5.35778 4.51975,-8.11334 10.18181,9.12279 14.88796,0.0198 6.55253,-4.0915 11.71099,-5.94317 19.3602,-4.07604 -1.05092,-5.5687 -0.13397,-12.62854 6.82412,-15.37762 7.15111,-5.90618 -0.0209,-17.14071 6.31639,-21.48184 5.04945,1.2716 0.80197,-7.785 2.51654,-10.53577 0.20317,-8.66701 9.26633,-8.72701 13.55755,-10.70657 9.53564,-3.531416 16.69251,-12.612844 24.69114,-19.349056 6.87231,-6.546465 15.60914,-10.492822 23.51834,-15.589779 -7.36311,-13.274087 -14.72621,-26.548177 -22.08932,-39.822264 -58.92435,3.136048 -117.8487,6.272096 -176.77305,9.408144 z"
                       id="Co_Donegal"
-                      onClick={() => { buttonClicked("Donegal") }}
+                      onClick={(e) => { e.preventDefault(); buttonClicked("Donegal") }}
                       className={styles.donegalMap} />
                     {hardMode ? <path
                       d="m 130.68178,224.38018 c -21.1633,9.22107 -42.326593,18.44215 -63.489891,27.66322 2.702616,35.7217 5.405231,71.44339 8.107847,107.16509 15.514551,1.44032 31.025974,2.91431 46.542534,4.33299 6.40335,4.5488 15.00934,8.29476 21.99727,3.77405 4.24524,1.2396 9.2872,2.73101 12.85901,0.1564 0.84369,9.17627 13.22617,9.74192 20.50334,6.93365 2.83787,0.81994 2.51305,9.9255 5.86144,3.66273 3.64703,0.45411 3.51796,8.19219 8.61399,10.88268 1.41386,6.42405 11.53557,2.8515 14.94768,-0.57599 0.44365,-6.48362 11.23691,-7.40535 5.97807,-15.09635 4.57952,-0.53087 3.6056,-3.79622 6.56525,-5.76952 -0.72415,-4.7394 2.5051,-13.35925 7.88088,-6.41185 4.91522,-0.98086 11.51784,-3.98523 13.3883,-8.94103 4.6515,0.73694 9.66769,-5.75759 11.0625,-10.34375 3.40189,-5.64297 -1.21111,-8.85955 -5.55094,-11.49969 4.44977,-2.37684 0.0486,-6.56273 4.42484,-9.02649 -3.22298,-6.29642 10.15551,2.23974 7.04872,-5.16832 -2.23214,-3.4802 -9.03738,-7.00196 -4.77745,-11.44787 -5.01227,-7.72035 8.16918,0.2019 9.25078,-1.04126 -0.50431,-5.64555 1.80828,-12.11424 -5.4165,-13.96815 -5.65799,-3.41573 -4.9932,10.80968 -11.17872,7.39934 -3.12379,7.03496 -13.29831,4.8892 -15.12009,-1.10013 0.14408,-5.48261 -1.75959,-4.45447 -5.21016,-2.17728 -3.538,-2.34722 -4.34657,-4.52793 -9.25173,-2.84513 -2.34863,-7.03353 7.22875,-7.90658 6.44404,-14.68377 7.09062,-0.93443 1.54357,-7.23738 -1.15301,-8.00055 -5.14637,-1.67877 -8.09864,-3.01529 -11.44311,0.49709 -9.23686,0.93183 -6.88103,-11.92627 -7.90137,-18.18476 -2.66853,-7.93824 3.47023,-24.89466 -9.4437,-22.34215 -20.51327,-1.28107 -41.02659,-2.5621 -61.53982,-3.8432 z"
                       id="Co_Mayo"
-                      onClick={() => { buttonClicked("Mayo") }}
+                      onClick={(e) => { e.preventDefault(); buttonClicked("Mayo") }}
                       className={styles.mayoMap} /> : <></>}
                     <path
                       d="m 263.5,347.34375 c -3.83138,2.48853 -7.59687,3.68187 -9.84375,8.15625 -5.93971,1.40549 -12.48779,3.14117 -17.84801,2.39733 -2.69291,2.2791 -6.87942,1.4781 -9.42812,2.78906 -7.79896,-8.25135 -5.38392,8.12091 -9.42087,8.47539 -0.73993,3.84555 -6.85873,4.70201 -2.71725,9.64089 -4.87076,4.1228 -7.35344,9.9709 -12.61966,12.84059 -4.28747,0.93591 -10.55369,2.19133 -10.8193,-4.1955 -5.92612,-1.77125 -4.1556,-13.76712 -9.90956,-6.98864 -2.91155,-2.05535 -0.75741,-8.95528 -7.32202,-5.2903 -6.84976,2.31727 -16.23097,-0.70832 -17.39174,-7.96794 -4.91083,4.47752 -11.35532,-1.85611 -17.38505,1.93978 -10.37324,1.33242 -18.11031,-8.67285 -29.03576,-6.68968 -11.155683,-1.08413 -22.311368,-2.16825 -33.467052,-3.25237 -3.231741,5.95973 -6.463482,11.91946 -9.695223,17.87919 14.426434,33.80358 28.852871,67.60715 43.279305,101.41073 18.1342,-0.57911 36.26839,-1.15821 54.40259,-1.73732 7.1611,-11.76543 14.32219,-23.53087 21.48329,-35.2963 8.03962,3.19807 21.67172,0.0193 25.80017,7.62496 6.89225,3.39759 -0.58288,11.26339 7.87291,13.87458 5.17968,2.58005 10.84932,5.30592 9.30466,11.35989 0.31686,4.21775 -0.39046,9.54892 4.26044,11.27941 0.82514,-7.67035 7.87606,4.33862 9.61784,-3.91975 5.3441,-8.00139 13.03302,-9.12086 21.59817,-9.49469 1.61017,3.70349 6.98746,5.2796 7.61703,10.81607 3.47991,-1.58079 6.81932,5.23513 9.07122,-1.6131 3.43078,2.57321 6.01006,4.88493 9.60268,1.11346 5.46642,-2.63483 4.69575,-14.54242 12.4526,-16.4492 4.99001,-5.41772 5.05483,-16.18335 14.04046,-16.45279 0.63045,-8.14877 16.13841,-2.55868 11.44094,-13.13055 -5.48508,-5.40337 -11.62696,-7.9345 -18.84745,-8.63144 -6.89753,-1.24752 -1.83475,-12.17949 -8.65599,-13.05051 -2.4384,-4.22262 1.96499,-9.97138 -2.94256,-12.14714 -1.421,-3.68622 4.46282,-4.1941 -0.87357,-7.45729 -3.07555,-2.996 -0.43937,-6.68934 -2.56509,-10.65793 3.22319,-1.55066 -5.0195,-8.73621 0.28815,-8.84348 -3.05375,-2.7494 -6.2781,-1.6355 -7.49486,-5.95931 -3.8386,-0.0294 -3.91004,-5.49937 -4.66207,-6.7786 9.59898,-3.19001 -5.0934,-4.74944 -5.03125,-10.5625 -0.86422,-2.19102 -2.19453,-5.78041 -7.76704,-3.97735 -2.15929,-1.7489 -4.3569,-0.0465 -6.38921,-1.0539 z"
                       id="Co Galway"
-                      onClick={() => { buttonClicked("Galway") }}
+                      onClick={(e) => { e.preventDefault(); buttonClicked("Galway") }}
                       className={styles.galwayMap} />
                     {hardMode ? <path
                       d="m 156.78367,489.31951 c -15.58133,22.66651 -31.16267,45.33303 -46.744,67.99954 1.67966,6.57095 0.0656,19.15722 9.29997,11.93099 8.05345,-3.39585 16.10691,-6.7917 24.16036,-10.18754 4.21653,-8.93522 15.56509,-3.49588 23.21127,-4.47413 6.20619,1.55256 11.97533,-2.6397 15.95125,3.21865 6.76566,-1.30216 11.57448,-6.84893 18.8991,-7.15057 6.52632,-7.63172 16.69614,-6.41537 25.28109,-10.15762 8.88156,-3.13384 17.58626,3.45153 25.28569,-2.11786 6.20923,-3.59414 8.3378,4.80388 14.24668,0.88514 0.76463,-4.64575 7.07857,-5.91136 4.15176,-11.72078 6.85462,-4.77225 8.90178,-11.47816 5.91066,-19.13908 6.14272,-4.20117 2.58225,-15.64558 12.73293,-13.09551 4.50992,-3.38745 8.30131,-14.25982 -0.68902,-11.99746 -2.97177,5.34311 -7.78459,-6.93507 -10.74524,1.50033 -4.02099,-2.236 -7.13287,-1.68299 -8.2199,-6.64767 -1.79437,-3.01017 -4.39995,-2.87382 -5.29762,-6.00287 -8.59552,0.36972 -16.30486,1.58024 -21.70376,9.58548 -1.13363,5.80142 -6.23903,1.35989 -8.47494,0.79271 -1.56343,7.27141 -7.62861,-3.67056 -4.60445,-6.83374 -2.26536,-4.03657 1.03264,-7.67424 -4.58442,-9.40632 -4.71735,-2.96535 -13.53567,-6.63793 -9.42689,-13.50008 -4.53201,-4.10524 -5.94155,-9.25487 -13.48753,-8.52938 -8.38946,-1.42861 -18.95125,-5.74675 -21.50594,5.70689 -7.88235,13.11363 -15.7647,26.22725 -23.64705,39.34088 z"
                       id="Co Clare"
-                      onClick={() => { buttonClicked("Clare") }}
+                      onClick={(e) => { e.preventDefault(); buttonClicked("Clare") }}
                       className={styles.clareMap} /> : <></>}
                     <path
                       d="m 177.59375,553.53125 c -7.96077,3.43202 -17.17037,-0.42756 -25.74676,0.58518 -7.80862,0.38791 -11.69881,9.39654 -20.33046,10.0641 -10.53079,4.22347 -21.19311,8.42421 -29.76065,16.0881 -23.001401,17.17363 -46.002798,34.34727 -69.004195,51.5209 -2.826309,29.28487 -5.652619,58.56975 -8.478928,87.85462 21.392707,0.15601 42.785414,0.31201 64.178121,0.46802 10.771464,-5.31055 21.542932,-10.6211 32.314392,-15.93165 3.4374,6.71377 7.24312,11.87192 7.07431,17.91397 7.1172,-1.31206 9.35084,-11.14917 17.46523,-11.63115 2.67907,-12.99922 22.17553,-0.0478 24.25667,-12.75205 7.53026,-1.24711 15.83084,-6.81675 17.33556,-14.49073 -8.19189,-9.11575 6.24361,-15.66619 14.05576,-15.37151 7.18133,-2.528 0.74857,-4.30176 -2.5527,-5.23486 -1.16135,-2.79357 -7.52243,-3.50551 -4.45286,-9.53906 6.18589,-3.66644 -2.5746,-9.11974 -2.69724,-15.51263 3.80666,-7.52793 -8.74976,-15.27379 -0.9375,-21.625 -1.19669,-3.76008 7.9757,-3.27112 1.90625,-7.1875 -0.18001,-6.09839 -15.74564,-6.83112 -10.64618,-12.5482 6.78415,-3.14476 -6.34699,-8.12957 2.31719,-11.63357 -7.23491,-5.12269 0.0494,-8.80748 0.80544,-13.32183 -0.23606,-4.40711 -7.306,-4.96303 -4.50154,-9.96479 -6.89666,-2.6388 3.13213,-5.38974 -2.59991,-7.75036 z"
                       id="Co_Kerry"
-                      onClick={() => { buttonClicked("Kerry") }}
+                      onClick={(e) => { e.preventDefault(); buttonClicked("Kerry") }}
                       className={styles.kerryMap} />
                     {hardMode ? <path
                       d="m 238.53125,593.15625 c -6.78229,3.62695 -7.56622,12.51354 -16.52923,12.60634 -5.35722,0.6392 -0.91483,8.75261 -5.70277,1.96426 -5.54941,-3.80112 -14.71014,-9.21197 -18.44576,-0.50171 -5.74317,0.39721 -2.3638,6.20097 -7.47913,6.85255 -4.58077,5.58346 -1.43769,12.28411 1.54988,18.37568 -2.47361,6.86765 4.13922,14.26526 4.49065,18.54043 -7.46284,3.97053 0.50888,12.56693 5.86636,12.72495 5.83842,4.38002 -6.72998,3.86132 -9.715,6.06137 -8.26378,1.75475 -9.91639,8.83446 -5.2329,14.45334 -3.43164,7.50917 -10.19628,11.86685 -17.60138,13.42914 -1.30723,10.62899 -15.74791,3.29222 -21.0073,8.0119 -4.3679,7.72395 -14.48415,7.51065 -17.47467,16.60675 -6.87576,0.63661 -2.1686,-7.34429 -6.71875,-11.03125 -2.26384,-11.07442 -10.96219,-2.99485 -17.43372,-0.34337 -6.81615,3.74311 -14.631288,6.15982 -20.658341,11.06412 -5.306952,5.37301 -10.613904,10.74601 -15.920856,16.11902 3.378033,12.61636 6.75607,25.23271 10.134103,37.84907 50.263184,0.72527 100.526374,1.45053 150.789554,2.1758 38.1882,-27.94978 76.37639,-55.89955 114.56459,-83.84933 -2.25905,-7.52515 0.27216,-21.82418 -6.18982,-24.87093 -7.23556,2.10099 -5.82002,-7.02155 -9.79577,-10.2316 -2.41297,-0.49573 -7.65685,-5.28862 -6.55224,-9.60028 1.36299,-4.80868 -11.06209,-10.25645 -4.24286,-8.79811 -0.70998,-5.29297 -14.84804,1.35391 -9.57995,-6.21585 3.71135,-2.42086 3.877,-8.37343 4.62167,-12.07346 -9.1115,-0.0104 -3.72078,-12.42731 -13.08452,-12.25989 -5.45694,1.69985 -8.05626,1.33191 -9.83911,-4.93938 -4.81561,-2.96843 -6.52175,7.97348 -13.46898,5.63044 -8.76237,5.65085 -15.33226,-3.70171 -19.83518,-9.12085 -6.31146,-1.0648 -3.66164,-11.54013 -10.64915,-5.51353 -3.77188,-2.68034 -7.01136,-1.88426 -8.14509,-1.1203 -0.7157,0.0856 0.22045,-2.04999 -0.71433,-1.99532 z"
                       id="Co_Cork"
-                      onClick={() => { buttonClicked("Cork") }}
+                      onClick={(e) => { e.preventDefault(); buttonClicked("Cork") }}
                       className={styles.corkMap} /> : <></>}
                     {hardMode ? <path
                       d="m 369.0625,597.71875 c -7.08043,0.95451 -12.51419,4.0137 -19.3913,3.80117 -5.11411,6.90623 2.96694,13.17762 3.3288,19.69883 2.01768,6.01019 -4.32023,2.09354 -7.30867,3.57709 -4.0529,-3.17825 -10.95356,-0.24184 -14.32101,-5.18256 -6.2408,-0.63621 -3.76545,4.01448 -5.42375,7.57127 -6.11086,-1.58974 -15.21125,-2.17522 -14.61697,6.68441 -5.43837,1.57784 -1.69215,6.99373 2.93646,4.53306 5.15716,-0.73051 4.00831,2.5578 5.0868,4.80066 7.38082,2.62363 1.26927,14.87552 10.3637,15.07172 1.43366,4.17349 4.67611,6.08872 5.4019,10.96752 9.67673,-3.15418 8.20978,7.74428 9.57277,14.60856 0.65552,5.66061 0.082,13.89175 7.09786,7.1336 28.97545,-15.91336 57.9509,-31.82672 86.92635,-47.74008 0.7161,-8.01043 5.11953,-17.57028 -1.86183,-23.98673 -1.5149,-2.18483 -0.66731,-8.82251 -5.39812,-3.59075 -2.39685,3.01218 -8.24516,3.00168 -8.26596,-0.44064 -4.84175,-1.12973 -8.06776,-3.07072 -10.60078,3.65396 -7.87447,1.36114 -8.24841,-13.03373 -15.53572,-15.92364 -4.36287,-0.76515 -9.34573,-0.13724 -13.43968,-2.93534 -5.04476,-1.76265 -9.57213,-1.48189 -14.55085,-2.30211 z m -50.875,43.90625 c -0.0881,-4.78511 -3.16506,0.13344 0,0 z"
                       id="Co_Waterford"
-                      onClick={() => { buttonClicked("Waterford") }}
+                      onClick={(e) => { e.preventDefault(); buttonClicked("Waterford") }}
                       className={styles.waterfordMap} /> : <></>}
 
                   </g>
@@ -138,55 +217,55 @@ export default function Home() {
                     style={{ "fontSize": "48px", "fontFamily": "sans-serif", "textAlign": "center", "textAnchor": "middle", "fill": "black", "fontWeight": "bold" }}
                     x="730"
                     y="300"
-                    onClick={() => { buttonClicked("Donegal") }}
+                    onClick={(e) => { e.preventDefault(); buttonClicked("Donegal") }}
                     className={styles.pointer}
                     id="text2">Dún na nGall</text>
                   {hardMode ? <text
                     style={{ "fontSize": "48px", "fontFamily": "sans-serif", "textAlign": "center", "textAnchor": "middle", "fill": "black", "fontWeight": "bold" }}
                     x="400"
                     y="700"
-                    onClick={() => { buttonClicked("Mayo") }}
+                    onClick={(e) => { e.preventDefault(); buttonClicked("Mayo") }}
                     className={styles.pointer}
                     id="text2">Maigh Eo</text> : <></>}
                   <text
                     style={{ "fontSize": "48px", "fontFamily": "sans-serif", "textAlign": "center", "textAnchor": "middle", "fill": "black", "fontWeight": "bold" }}
                     x="450"
                     y="950"
-                    onClick={() => { buttonClicked("Galway") }}
+                    onClick={(e) => { e.preventDefault(); buttonClicked("Galway") }}
                     className={styles.pointer}
                     id="text2">Gaillimh</text>
                   {hardMode ? <text
                     style={{ "fontSize": "48px", "fontFamily": "sans-serif", "textAlign": "center", "textAnchor": "middle", "fill": "black", "fontWeight": "bold" }}
                     x="480"
                     y="1140"
-                    onClick={() => { buttonClicked("Clare") }}
+                    onClick={(e) => { e.preventDefault(); buttonClicked("Clare") }}
                     className={styles.pointer}
                     id="text2">An Clár</text> : <></>}
                   <text
                     style={{ "fontSize": "48px", "fontFamily": "sans-serif", "textAlign": "center", "textAnchor": "middle", "fill": "black", "fontWeight": "bold" }}
                     x="300"
                     y="1450"
-                    onClick={() => { buttonClicked("Kerry") }}
+                    onClick={(e) => { e.preventDefault(); buttonClicked("Kerry") }}
                     className={styles.pointer}
                     id="text2">Ciarraí</text>
                   {hardMode ? <text
                     style={{ "fontSize": "48px", "fontFamily": "sans-serif", "textAlign": "center", "textAnchor": "middle", "fill": "black", "fontWeight": "bold" }}
                     x="570"
                     y="1500"
-                    onClick={() => { buttonClicked("Cork") }}
+                    onClick={(e) => { e.preventDefault(); buttonClicked("Cork") }}
                     className={styles.pointer}
                     id="text2">Corcaigh</text> : <></>}
                   {hardMode ? <text
                     style={{ "fontSize": "48px", "fontFamily": "sans-serif", "textAlign": "center", "textAnchor": "middle", "fill": "black", "fontWeight": "bold" }}
                     x="840"
                     y="1430"
-                    onClick={() => { buttonClicked("Waterford") }}
+                    onClick={(e) => { e.preventDefault(); buttonClicked("Waterford") }}
                     className={styles.pointer}
                     id="text2">Port Láirge</text> : <></>}
 
                 </svg>
               </div>
-              {answerResult[0] == "C" ? <div className={styles.rightAnswer}>{answerResult}</div> : (answerResult[0] == "M" ? <div className={styles.wrongAnswer}>{answerResult}</div> : <div className={styles.firstQuestion}>{answerResult}</div>)}
+              {(answerResult[0] == "C" ? <div className={styles.rightAnswer}>{answerResult}</div> : (answerResult[0] == "M" || answerResult[0] == "T") ? <div className={styles.wrongAnswer}>{answerResult}</div> : <div className={styles.firstQuestion}>{answerResult}</div>)}
               <table className={styles.answerTable}>
                 <tbody>
                   <tr>
@@ -203,12 +282,89 @@ export default function Home() {
               {/* <img src="ireland_counties_simple.svg" className={styles.countiesImage}></img> */}
 
             </div>
-          </>
-            : <><button className={styles.startButton} onClick={() => { setHardMode(0); startGame() }}>Éasca</button><button className={styles.startButton} onClick={() => { setHardMode(1); startGame() }}>Deacair</button>
-            </>}
+          </> : <div className={styles.resultsPage}>
+            <h1>Scór deiridh</h1>
+            <h2>Modh {hardMode == 1 ? <>deacair</> : <>éasca</>}</h2>
+            <div style={{ "text-align": "center", "width": "50%", "margin-left": "25%" }}>
+              <table className={styles.answerTable}>
+                <tbody>
+                  <tr>
+                    <td>Ceart</td>
+                    <td>{correctAnswers}</td>
+                  </tr>
+                  <tr>
+                    <td>Mícheart</td>
+                    <td>{incorrectAnswers}</td>
+                  </tr>
+                  <tr>
+                    <td>% Ceart</td>
+                    <td>{Math.round((correctAnswers / (correctAnswers + incorrectAnswers)) * 100)}%</td>
+                  </tr>
+                </tbody>
+              </table>
+              <table className={styles.countyResultsTable}>
+                <thead>
+                  <th>Contae</th>
+                  <th>Ceart</th>
+                  <th>Mícheart</th>
+                  <th>% Ceart</th>
+                </thead>
+                <tbody>
+
+                  {["Dún na nGall", "Gaillimh", "Ciarraí", "Maigh Eo", "An Clár", "Corcaigh", "Port Láirge"].map((c, i) =>
+                    <tr>
+                      <td>{c}</td>
+                      <td>{correctCounties[i]}</td>
+                      <td>{incorrectCounties[i]}</td>
+                      <td>{Math.round((correctCounties[i] / (correctCounties[i] + incorrectCounties[i])) * 100)}%</td>
+                    </tr>)}
+                </tbody>
+              </table>
+            </div>
+            <div>
+              Freagra deireanach: {(answerResult[0] == "C" ? <div className={styles.rightAnswer}>{answerResult}</div> : (answerResult[0] == "M" || answerResult[0] == "T") ? <div className={styles.wrongAnswer}>{answerResult}</div> : <div className={styles.firstQuestion}>{answerResult}</div>)}
+            </div>
+            <div onClick={() => {
+              setGameStarted(0);
+              setGameOver(0);
+              setAnswerResult("Roghnaigh contae.");
+              setCorrectAnswers(0);
+              setIncorrectAnswers(0);
+              setHardMode(0);
+              setQuestionNumber(1);
+              setTimeLeft(timerStart);
+            }} className={styles.restartButton}>Cluiche nua</div>
+          </div>
+          )
+            :
+            <div className={styles.startPage}>
+              <h1 className={styles.startPageTitle}>Tomhais an Contae</h1>
+              <br />
+              <div className={styles.instructions}>
+                Tá fiche ceist ann. Taispeánfar sliocht as Bailiúchán na Scol (le fáil ar dúchas.ie), agus beidh ort a thomhais cén contae as ar tháinig an sliocht sin.
+              </div>
+              <h2 className={styles.startPageSubtitle}>Roghnaigh deacracht chun tosú:</h2>
+              <div className={styles.startButtonsContainer}>
+                <div className={styles.startButton} onClick={() => { setHardMode(0); startGame(0) }}>
+                  <div className={styles.startButtonMeta}>
+                    <div className={styles.startButtonHeader}>Éasca</div>
+                    Beidh ceann amháin de Dhún na nGall, Gaillimh agus Ciarraí le roghnú agat.
+                  </div>
+                  <img className={styles.startButtonImage} src="contaetha-easca.png" />
+                </div>
+                <div className={styles.startButton} onClick={() => { setHardMode(1); startGame(1); }}>
+                  <div className={styles.startButtonMeta}>
+                    <div className={styles.startButtonHeader}>Deacair</div>
+                    Beidh ceann amháin de sheacht gcontae le roghnú agat. Tá sé seo an-deacair, fiú don saineolaí!
+                  </div>
+                  <img className={styles.startButtonImage} src="contaetha-deacair.png" />
+                </div>
+              </div>
+            </div>
+          }
 
         </div>
-      </main>
+      </main >
 
       <style jsx global>{`
         html,
@@ -234,6 +390,6 @@ export default function Home() {
           box-sizing: border-box;
         }
       `}</style>
-    </div>
+    </div >
   );
 }

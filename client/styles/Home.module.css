@@ -1,13 +1,15 @@
 .mainContainer {
     display: flex;
-    padding: 20px;
+    padding: 10px 20px 0px 10px;
+    max-height: 100%;
+    height: 90%;
     margin: 0px 10px 0px 0px;
 }
 
 .pageExtract {
     max-width: 60%;
     min-width: 60%;
-    max-height: 100%;
+    max-height: 90%;
     overflow: hidden;
     background-color: #ffffc0;
     min-height: 50%;
@@ -110,13 +112,6 @@
     color: darkred;
 }
 
-.startButton {
-    width: 100%;
-    height: 100%;
-    padding: 20px;
-    font-size: 5em;
-}
-
 .countiesImage {
     width: 300px;
 }
@@ -128,6 +123,7 @@
 .answerTable td {
     padding: 10px;
     border: -5px;
+
 }
 
 .answerTable {
@@ -143,8 +139,123 @@
 .answerTable tr:nth-child(2) {
     background-color: lightcoral;
 }
+.answerTable tr:nth-child(3) {
+    background-color: lightgray;
+    font-weight: bold;
+}
 
 .questionNumber {
     font-size: 2em;
     font-weight: bold;
+}
+
+.timerBar {
+    width: 100%;
+    display: flex;
+    background-color: deepskyblue;
+    border-radius: 0px;
+}
+
+.timerElapsed {
+    background-color: dodgerblue;
+    padding: 5px;
+    font-weight: bold;
+    border-radius: 0px;
+}
+
+.timerInterface {
+    display: flex;
+}
+
+.timerInterface button {
+    background-color: lightgray;
+    border: 0px;
+    padding: 10px;
+}
+
+/* Start page */
+
+.startButtonsContainer {
+    display: flex;
+    font-size: 1em;
+}
+
+.startButton {
+    width: 100%;
+    height: 100%;
+    padding: 20px;
+    border: 0px;
+    border-radius: 5px;
+    margin: 10px;
+    background-color: lightblue;
+    font-size: 2em;
+    display: flex;
+}
+
+.startButton:hover,
+.restartButton:hover {
+    background-color: skyblue;
+}
+
+.startPage {
+    width: 100%;
+}
+
+.startPageTitle {
+    font-size: 4em;
+    text-align: center;
+    width: 100%;
+    margin: 10px;
+}
+
+.startPageSubtitle {
+    font-size: 2em;
+    text-align: center;
+    width: 100%;
+    margin: 10px;
+}
+
+.instructions {
+    padding: 10px;
+    font-size: 2em;
+}
+
+.startButtonImage {
+    width: 200px;
+}
+
+.startButtonHeader {
+    font-size: 2em;
+    font-weight: bold;
+}
+
+/* Results page */
+
+.resultsPage {
+    width: 100%;
+    text-align: center;
+}
+
+.restartButton {
+    text-align: center;
+    width: 20%;
+    margin-left: 40%;
+    margin-top: 10px;
+    height: 10%;
+    padding-top: 10px;
+    border: 0px;
+    border-radius: 5px;
+    background-color: lightblue;
+    font-size: 2em;
+}
+
+.countyResultsTable {
+    margin-left: 30%;
+    text-align: center;
+    width: 40%;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+.countyResultsTable tr:nth-child(odd) {
+    background-color: whitesmoke;
 }
