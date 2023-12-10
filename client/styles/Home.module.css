@@ -2,20 +2,21 @@
     display: flex;
     padding: 10px 20px 0px 10px;
     max-height: 100%;
-    height: 90%;
+    height: 70%;
     margin: 0px 10px 0px 0px;
+    background-color: white;
 }
 
 .pageExtract {
     max-width: 60%;
     min-width: 60%;
-    max-height: 90%;
+    max-height: 80%;
     overflow: hidden;
-    background-color: #ffffc0;
+    background-color: #d0ffff;
     min-height: 50%;
     margin-right: 20px;
     padding: 20px;
-    border: 1px solid black;
+    border: 0px;
     border-radius: 20px;
 }
 
@@ -59,16 +60,24 @@
 }
 
 .pointer,
+.pageHeader,
+.startButton,
 .donegalMap,
-.mayoMap,
 .galwayMap,
-.clareMap,
 .kerryMap,
-.corkMap,
 .waterfordMap {
     cursor: pointer;
+    fill: #80ffff;
 }
 
+.mayoMap,
+.clareMap,
+.corkMap {
+    cursor: pointer;
+    fill: #00ced1;
+}
+
+/* 
 .donegalMap {
     fill: lightcoral;
 }
@@ -95,7 +104,7 @@
 
 .waterfordMap {
     fill: violet;
-}
+} */
 
 .rightAnswer,
 .wrongAnswer,
@@ -121,26 +130,30 @@
 }
 
 .answerTable td {
-    padding: 10px;
+    padding: 15px;
     border: -5px;
-
 }
 
 .answerTable {
     width: 100%;
     font-size: 1.5em;
     margin: 0px;
+    border-collapse: collapse;
 }
 
 .answerTable tr:nth-child(1) {
-    background-color: lightgreen;
+    /* background-color: lightgreen; */
+    background-color: #80ffff;
 }
 
 .answerTable tr:nth-child(2) {
-    background-color: lightcoral;
+    /* background-color: lightcoral; */
+    background-color: #70e0e0;
 }
+
 .answerTable tr:nth-child(3) {
-    background-color: lightgray;
+    /* background-color: lightgray; */
+    background-color: #80ffff;
     font-weight: bold;
 }
 
@@ -165,10 +178,12 @@
 
 .timerInterface {
     display: flex;
+    border-radius: 20px;
+    overflow: hidden;
 }
 
 .timerInterface button {
-    background-color: lightgray;
+    background-color: #80f0f0;
     border: 0px;
     padding: 10px;
 }
@@ -187,7 +202,7 @@
     border: 0px;
     border-radius: 5px;
     margin: 10px;
-    background-color: lightblue;
+    background-color: #80f0f0;
     font-size: 2em;
     display: flex;
 }
@@ -243,9 +258,10 @@
     margin-top: 10px;
     height: 10%;
     padding-top: 10px;
+    padding-bottom: 55px;
     border: 0px;
     border-radius: 5px;
-    background-color: lightblue;
+    background-color: #80f0f0;
     font-size: 2em;
 }
 
@@ -255,7 +271,34 @@
     width: 40%;
     margin-top: 10px;
     margin-bottom: 10px;
+    border-collapse: collapse;
 }
+
+.countyResultsTable tr:nth-child(even) {
+    background-color: #70e0e0;
+}
+
 .countyResultsTable tr:nth-child(odd) {
-    background-color: whitesmoke;
+    background-color: #80ffff;
+}
+
+.tableRow {
+    display: flex;
+}
+
+.tableHeader {
+    display: flex;
+    padding: 0px 10px 0px 0px;
+}
+
+.pageHeader {
+    font-family: Arial;
+    font-size: 2em;
+    margin: 20px 50px;
+    color: #008080;
+    font-weight: bold;
+}
+
+.svgAndAnswerCount {
+    display: flex;
 }
