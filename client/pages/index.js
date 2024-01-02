@@ -37,7 +37,7 @@ export default function Home() {
   }
 
   function getItem() {
-    var urlToFetch = hardMode ? "http://localhost:5000/getItemHard" : "http://localhost:5000/getItemEasy"
+    var urlToFetch = hardMode ? "https://2-dot-tomhais-an-contae.ew.r.appspot.com/getItemHard" : "https://2-dot-tomhais-an-contae.ew.r.appspot.com/getItemEasy"
     fetch(urlToFetch)
       .then(response => response.json())
       .then(data => {
