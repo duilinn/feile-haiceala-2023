@@ -1,5 +1,4 @@
-.mainContainer {
-    display: flex;
+.mainContainer, .mainContainerSmall {
     padding: 10px 20px 0px 10px;
     max-height: 100%;
     height: 70%;
@@ -7,17 +6,23 @@
     background-color: white;
 }
 
+.mainContainer {
+    display: flex;
+}
+
 .pageExtract {
-    max-width: 60%;
+    max-width: 90%;
     min-width: 60%;
     max-height: 80%;
     overflow: hidden;
     background-color: #d0ffff;
     min-height: 50%;
-    margin-right: 20px;
+    margin-right: 10px;
+    margin-bottom: 10px;
     padding: 20px;
     border: 0px;
     border-radius: 20px;
+    font-size: 1.2em;
 }
 
 .donegalButton,
@@ -190,13 +195,16 @@
 
 /* Start page */
 
-.startButtonsContainer {
-    display: flex;
+.startButtonsContainer, .startButtonsContainerSmall {
     font-size: 1em;
 }
 
+.startButtonsContainer {
+    display: flex;
+}
+
 .startButton {
-    width: 100%;
+    width: 50%;
     height: 100%;
     padding: 20px;
     border: 0px;
@@ -295,10 +303,26 @@
     font-family: Arial;
     font-size: 2em;
     margin: 20px 50px;
-    color: #008080;
-    font-weight: bold;
+    color: #000000;
+    font-weight: normal;
+    width: 80%;
 }
 
 .svgAndAnswerCount {
     display: flex;
+}
+
+.headerBar {
+    width: 100%;
+    margin: 0px;
+    display: flex;
+}
+
+.languageSelector {
+    padding-left: 10px;
+    padding-top: 10px;
+}
+.languageSelector select {
+    border-width: 1px;
+    height: 100%;
 }

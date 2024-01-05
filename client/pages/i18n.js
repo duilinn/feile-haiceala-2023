@@ -48,13 +48,17 @@ i18n
                     "hard": "Hard",
                     "easyDescription": "You will have to choose between Donegal, Galway and Kerry.",
                     "hardDescription": "You will have to choose between seven counties. This is very difficult, even for those with a good knowledge of Irish dialects!",
+
+                    "choose language": "Choose language",
+                    "english": "English",
+                    "irish": "Irish",
                 }
             },
             ga: {
                 translation: {
                     "Welcome to React": "Welcome to React and react-i18next",
                     "guess the county": "Tomhais an Contae",
-                    "question": "ceist",
+                    "question": "Ceist",
                     "skip": "Scipeáil",
 
                     "correct": "Ceart",
@@ -90,6 +94,10 @@ i18n
                     "hard": "Deacair",
                     "easyDescription": "Beidh ceann amháin de Dhún na nGall, Gaillimh agus Ciarraí le roghnú agat.",
                     "hardDescription": "Beidh ceann amháin de sheacht gcontae le roghnú agat. Tá sé seo an-deacair, fiú don saineolaí!",
+
+                    "choose language": "Choose language",
+                    "english": "English",
+                    "irish": "Irish",
                 }
             }
         },

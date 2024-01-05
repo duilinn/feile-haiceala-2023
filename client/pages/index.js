@@ -4,9 +4,10 @@ import React, { useState, useEffect } from "react";
 
 import "./i18n"
 import { useTranslation } from 'react-i18next';
+import { useMediaQuery } from "react-responsive";
 
 export default function Home() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const [currentPages, setCurrentPages] = useState([]);
   const [currentCounty, setCurrentCounty] = useState("");
   const [answerResult, setAnswerResult] = useState(t("choose a county") + ".");
@@ -24,7 +25,9 @@ export default function Home() {
   const [correctCounties, setCorrectCounties] = useState([0, 0, 0, 0, 0, 0, 0]);
   const [incorrectCounties, setIncorrectCounties] = useState([0, 0, 0, 0, 0, 0, 0]);
 
-
+  const isSmallScreen = useMediaQuery({
+    query: "(max-width: 1000px)"
+  })
 
   function startGame(isHardMode) {
     setGameStarted(1);
@@ -129,14 +132,19 @@ export default function Home() {
 
       <main>
         <div className={styles.pageContainer}>
-          {gameStarted ? <div className={styles.pageHeader} onClick={() => { setGameStarted(false) }}>
-            <b>{t("guess the county")}</b>
-          </div> : <></>}
-          <div className={styles.mainContainer}>
+          {gameStarted ?
+            <div className={styles.headerBar}>
+              <div className={styles.pageHeader} onClick={() => { setGameStarted(false) }}>
+                <b>{t("guess the county")}</b>
+              </div>
+            </div>
+            : <></>}
+          <div className={(isSmallScreen) ? styles.mainContainerSmall : styles.mainContainer}>
             <br />
             {gameStarted == 1 ? (gameOver == 0 ? <>
               <div className={styles.pageExtract}>
-                {currentPages.map((page, i) => <div key={i}>{page.substring(0, 2000)}</div>)}
+                {/* {console.log("current page has " + currentPages.length + " pages")}{currentPages.map((page, i) => <div key={i}>{page.substring(0, 2000)}</div>)} */}
+                {currentPages.join(" ").substring(0, 2000)}
               </div>
               <div className={styles.sidebar}>
                 <div className={styles.timerInterface}>
@@ -363,7 +371,7 @@ export default function Home() {
                   {t("gameInstructions")}
                 </div>
                 <h2 className={styles.startPageSubtitle}>{t("chooseDifficulty")}:</h2>
-                <div className={styles.startButtonsContainer}>
+                <div className={(isSmallScreen) ? styles.startButtonsContainerSmall : styles.startButtonsContainer}>
                   <div className={styles.startButton} onClick={() => { setHardMode(0); startGame(0) }}>
                     <div className={styles.startButtonMeta}>
                       <div className={styles.startButtonHeader}>{t("easy")}</div>
@@ -383,6 +391,14 @@ export default function Home() {
             }
 
           </div>
+        </div>
+        <div className={styles.languageSelector}>
+          {t("Choose language: ")}
+          <select onChange={(e) => i18n.changeLanguage(e.target.value)}>
+            <option>Choose language:</option>
+            <option value="ga">Gaeilge</option>
+            <option value="en">English</option>
+          </select>
         </div>
       </main>
 
