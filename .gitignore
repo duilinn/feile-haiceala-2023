@@ -1,5 +1,6 @@
 *.ods
 *.odt
+*.odt#
 organising_data/
 *.svg
 server/volumes_by_county/

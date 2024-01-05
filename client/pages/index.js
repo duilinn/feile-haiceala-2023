@@ -2,10 +2,14 @@ import Head from 'next/head';
 import styles from '../styles/Home.module.css';
 import React, { useState, useEffect } from "react";
 
+import "./i18n"
+import { useTranslation } from 'react-i18next';
+
 export default function Home() {
+  const { t } = useTranslation()
   const [currentPages, setCurrentPages] = useState([]);
   const [currentCounty, setCurrentCounty] = useState("");
-  const [answerResult, setAnswerResult] = useState("Roghnaigh contae.");
+  const [answerResult, setAnswerResult] = useState(t("choose a county") + ".");
   const [correctAnswers, setCorrectAnswers] = useState(0);
   const [incorrectAnswers, setIncorrectAnswers] = useState(0);
 
@@ -19,6 +23,8 @@ export default function Home() {
 
   const [correctCounties, setCorrectCounties] = useState([0, 0, 0, 0, 0, 0, 0]);
   const [incorrectCounties, setIncorrectCounties] = useState([0, 0, 0, 0, 0, 0, 0]);
+
+
 
   function startGame(isHardMode) {
     setGameStarted(1);
@@ -56,20 +62,20 @@ export default function Home() {
     // value={inputTexts[i]} placeholder={"Word " + (i + 1)}
     // onChange={(e) => { setInputTexts(previousInputTexts => [...previousInputTexts.slice(0, i), e.target.value, ...previousInputTexts.slice(i + 1)]) }} />
     if (countyName == currentCounty) {
-      setAnswerResult("Ceart! " + translateCounty(currentCounty) + " a bhí ann.");
+      setAnswerResult(t("correct") + "! " + t(currentCounty) + " " + t("was the correct answer") + ".");
       setCorrectAnswers(correctAnswers + 1);
 
       var i = getCountyIndex(currentCounty);
       setCorrectCounties(p => [...p.slice(0, i), p[i] + 1, ...p.slice(i + 1)]);
 
     } else if (countyName != "") {
-      setAnswerResult("Mícheart! Roghnaigh tú " + translateCounty(countyName) + ", ach " + translateCounty(currentCounty) + " a bhí ann.");
+      setAnswerResult(t("incorrect") + "! " + t("you chose") + " " + t(countyName) + ", " + t("but") + " " + t(currentCounty) + " " + t("was the correct answer") + ".");
       setIncorrectAnswers(incorrectAnswers + 1);
 
       var i = getCountyIndex(currentCounty);
       setIncorrectCounties(p => [...p.slice(0, i), p[i] + 1, ...p.slice(i + 1)]);
     } else {
-      setAnswerResult("Tá an t-am caite! " + translateCounty(currentCounty) + " a bhí ann.");
+      setAnswerResult(t("time's up") + " " + t(currentCounty) + " " + t("was the correct answer") + ".");
       setIncorrectAnswers(incorrectAnswers + 1);
 
       var i = getCountyIndex(currentCounty);
@@ -117,20 +123,20 @@ export default function Home() {
   return (
     <div className={styles.container}>
       <Head>
-        <title>Tomhais an Contae</title>
+        <title>{t("guess the county")}</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
       <main>
         <div className={styles.pageContainer}>
-          {gameStarted ? <div className={styles.pageHeader} onClick={() => {setGameStarted(false)}}>
-            <b>Tomhais an Contae</b>
+          {gameStarted ? <div className={styles.pageHeader} onClick={() => { setGameStarted(false) }}>
+            <b>{t("guess the county")}</b>
           </div> : <></>}
           <div className={styles.mainContainer}>
             <br />
             {gameStarted == 1 ? (gameOver == 0 ? <>
               <div className={styles.pageExtract}>
-                {currentPages.map((page, i) => <div key={i}>{page.substring(0,2000)}</div>)}
+                {currentPages.map((page, i) => <div key={i}>{page.substring(0, 2000)}</div>)}
               </div>
               <div className={styles.sidebar}>
                 <div className={styles.timerInterface}>
@@ -141,7 +147,7 @@ export default function Home() {
                   </div>
                   <div>
                     <button className={styles.skipButton} onClick={(e) => { e.preventDefault(); buttonClicked(""); }}>
-                      Scipeáil
+                      {t("skip")}
                     </button>
                   </div>
                 </div>
@@ -169,7 +175,7 @@ export default function Home() {
                 </button> : <></>}
               </div> */}
                 <div style={{ "width": "90%", "maxHeight": "90%" }}>
-                  <span className={styles.questionNumber}>Ceist {questionNumber}</span>
+                  <span className={styles.questionNumber}>{t("question")} {questionNumber}</span>
                   <div className={styles.svgAndAnswerCount}>
                     <svg version="1.0"
                       viewBox="0 0 1400 1800"
@@ -225,61 +231,61 @@ export default function Home() {
                         y="300"
                         onClick={(e) => { e.preventDefault(); buttonClicked("Donegal") }}
                         className={styles.pointer}
-                        id="text2">Dún na nGall</text>
+                        id="text2">{t("donegal")}</text>
                       {hardMode ? <text
                         style={{ "fontSize": "48px", "fontFamily": "sans-serif", "textAlign": "center", "textAnchor": "middle", "fill": "black", "fontWeight": "bold" }}
                         x="400"
                         y="700"
                         onClick={(e) => { e.preventDefault(); buttonClicked("Mayo") }}
                         className={styles.pointer}
-                        id="text2">Maigh Eo</text> : <></>}
+                        id="text2">{t("mayo")}</text> : <></>}
                       <text
                         style={{ "fontSize": "48px", "fontFamily": "sans-serif", "textAlign": "center", "textAnchor": "middle", "fill": "black", "fontWeight": "bold" }}
                         x="450"
                         y="950"
                         onClick={(e) => { e.preventDefault(); buttonClicked("Galway") }}
                         className={styles.pointer}
-                        id="text2">Gaillimh</text>
+                        id="text2">{t("galway")}</text>
                       {hardMode ? <text
                         style={{ "fontSize": "48px", "fontFamily": "sans-serif", "textAlign": "center", "textAnchor": "middle", "fill": "black", "fontWeight": "bold" }}
                         x="480"
                         y="1140"
                         onClick={(e) => { e.preventDefault(); buttonClicked("Clare") }}
                         className={styles.pointer}
-                        id="text2">An Clár</text> : <></>}
+                        id="text2">{t("clare")}</text> : <></>}
                       <text
                         style={{ "fontSize": "48px", "fontFamily": "sans-serif", "textAlign": "center", "textAnchor": "middle", "fill": "black", "fontWeight": "bold" }}
                         x="300"
                         y="1450"
                         onClick={(e) => { e.preventDefault(); buttonClicked("Kerry") }}
                         className={styles.pointer}
-                        id="text2">Ciarraí</text>
+                        id="text2">{t("kerry")}</text>
                       {hardMode ? <text
                         style={{ "fontSize": "48px", "fontFamily": "sans-serif", "textAlign": "center", "textAnchor": "middle", "fill": "black", "fontWeight": "bold" }}
                         x="570"
                         y="1500"
                         onClick={(e) => { e.preventDefault(); buttonClicked("Cork") }}
                         className={styles.pointer}
-                        id="text2">Corcaigh</text> : <></>}
+                        id="text2">{t("cork")}</text> : <></>}
                       {hardMode ? <text
                         style={{ "fontSize": "48px", "fontFamily": "sans-serif", "textAlign": "center", "textAnchor": "middle", "fill": "black", "fontWeight": "bold" }}
                         x="840"
                         y="1430"
                         onClick={(e) => { e.preventDefault(); buttonClicked("Waterford") }}
                         className={styles.pointer}
-                        id="text2">Port Láirge</text> : <></>}
+                        id="text2">{t("waterford")}</text> : <></>}
 
                     </svg>
-                  
+
                     <div style={{ "borderRadius": "0px", "paddingRight": "50px", "overflow": "hidden" }}>
                       <table className={styles.answerTable}>
                         <tbody>
                           <tr>
-                            <td>Ceart</td>
+                            <td>{t("correct")}</td>
                             <td>{correctAnswers}</td>
                           </tr>
                           <tr>
-                            <td>Mícheart</td>
+                            <td>{t("incorrect")}</td>
                             <td>{incorrectAnswers}</td>
                           </tr>
                         </tbody>
@@ -294,22 +300,22 @@ export default function Home() {
 
               </div>
             </> : <div className={styles.resultsPage}>
-              <h1>Scór deiridh</h1>
-              <h2>Modh {hardMode == 1 ? <>deacair</> : <>éasca</>}</h2>
+              <h1>{t("final score")}</h1>
+              <h2>{hardMode == 1 ? <>{t("hard mode")}</> : <>{t("easy mode")}</>}</h2>
               <div style={{ "text-align": "center", "width": "50%", "margin-left": "25%" }}>
                 <div style={{ "borderRadius": "10px", "overflow": "hidden" }}>
                   <table className={styles.answerTable}>
                     <tbody>
                       <tr>
-                        <td>Ceart</td>
+                        <td>{t("correct")}</td>
                         <td>{correctAnswers}</td>
                       </tr>
                       <tr>
-                        <td>Mícheart</td>
+                        <td>{t("incorrect")}</td>
                         <td>{incorrectAnswers}</td>
                       </tr>
                       <tr>
-                        <td>% Ceart</td>
+                        <td>% {t("correct")}</td>
                         <td>{Math.round((correctAnswers / (correctAnswers + incorrectAnswers)) * 100)}%</td>
                       </tr>
                     </tbody>
@@ -317,14 +323,14 @@ export default function Home() {
                 </div>
                 <table className={styles.countyResultsTable}>
                   <thead>
-                    <th>Contae</th>
-                    <th>Ceart</th>
-                    <th>Mícheart</th>
-                    <th>% Ceart</th>
+                    <th>{t("county")}</th>
+                    <th>{t("correct")}</th>
+                    <th>{t("incorrect")}</th>
+                    <th>% {t("correct")}</th>
                   </thead>
                   <tbody>
 
-                    {(hardMode ? ["Dún na nGall", "Gaillimh", "Ciarraí", "Maigh Eo", "An Clár", "Corcaigh", "Port Láirge"] : ["Dún na nGall", "Gaillimh", "Ciarraí"]).map((c, i) =>
+                    {(hardMode ? [t("donegal"), t("galway"), t("kerry"), t("mayo"), t("clare"), t("cork"), t("waterford")] : [t("donegal"), t("galway"), t("kerry")]).map((c, i) =>
                       <tr>
                         <td>{c}</td>
                         <td>{correctCounties[i]}</td>
@@ -335,40 +341,40 @@ export default function Home() {
                 </table>
               </div>
               <div>
-                Freagra deireanach: {(answerResult[0] == "C" ? <div className={styles.rightAnswer}>{answerResult}</div> : (answerResult[0] == "M" || answerResult[0] == "T") ? <div className={styles.wrongAnswer}>{answerResult}</div> : <div className={styles.firstQuestion}>{answerResult}</div>)}
+                {t("last answer")}: {(answerResult[0] == "C" ? <div className={styles.rightAnswer}>{answerResult}</div> : (answerResult[0] == "M" || answerResult[0] == "T") ? <div className={styles.wrongAnswer}>{answerResult}</div> : <div className={styles.firstQuestion}>{answerResult}</div>)}
               </div>
               <div onClick={() => {
                 setGameStarted(0);
                 setGameOver(0);
-                setAnswerResult("Roghnaigh contae.");
+                setAnswerResult(t("choose a county") + ".");
                 setCorrectAnswers(0);
                 setIncorrectAnswers(0);
                 setHardMode(0);
                 setQuestionNumber(1);
                 setTimeLeft(timerStart);
-              }} className={styles.restartButton}>Cluiche nua</div>
+              }} className={styles.restartButton}>{t("new game")}</div>
             </div>
             )
               :
               <div className={styles.startPage}>
-                <h1 className={styles.startPageTitle}>Tomhais an Contae</h1>
+                <h1 className={styles.startPageTitle}>{t("guess the county")}</h1>
                 <br />
                 <div className={styles.instructions}>
-                  Tá fiche ceist ann. Taispeánfar sliocht as Bailiúchán na Scol (le fáil ar dúchas.ie), agus beidh ort a thomhais cén contae as ar tháinig an sliocht sin.
+                  {t("gameInstructions")}
                 </div>
-                <h2 className={styles.startPageSubtitle}>Roghnaigh deacracht chun tosú:</h2>
+                <h2 className={styles.startPageSubtitle}>{t("chooseDifficulty")}:</h2>
                 <div className={styles.startButtonsContainer}>
                   <div className={styles.startButton} onClick={() => { setHardMode(0); startGame(0) }}>
                     <div className={styles.startButtonMeta}>
-                      <div className={styles.startButtonHeader}>Éasca</div>
-                      Beidh ceann amháin de Dhún na nGall, Gaillimh agus Ciarraí le roghnú agat.
+                      <div className={styles.startButtonHeader}>{t("easy")}</div>
+                      {t("easyDescription")}
                     </div>
                     <img className={styles.startButtonImage} src="contaetha-easca.png" />
                   </div>
                   <div className={styles.startButton} onClick={() => { setHardMode(1); startGame(1); }}>
                     <div className={styles.startButtonMeta}>
-                      <div className={styles.startButtonHeader}>Deacair</div>
-                      Beidh ceann amháin de sheacht gcontae le roghnú agat. Tá sé seo an-deacair, fiú don saineolaí!
+                      <div className={styles.startButtonHeader}>{t("hard")}</div>
+                      {t("hardDescription")}
                     </div>
                     <img className={styles.startButtonImage} src="contaetha-deacair.png" />
                   </div>
